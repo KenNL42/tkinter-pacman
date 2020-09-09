@@ -71,22 +71,43 @@ class Dot:
     def draw(self, canvas):
         size = 5
         x = canvas.create_oval(self.x - size, self.y - size, self.x + size, self.y + size, fill='white')
+        #canvas.create_oval(self.x - size, self.y - size, self.x + size, self.y + size, fill='white')
         dot_queue.append(x)
     
     # reassign random position
     def changePos(self):
-        self.x = random.randrange(WINDOW_WIDTH)
-        self.y = random.randrange(WINDOW_HEIGHT)
+        #self.x = random.randrange(WINDOW_WIDTH)
+        #self.y = random.randrange(WINDOW_HEIGHT)
+        self.x = 0
+        self.y = 0
 
 # check if pacman is on top of dot or not
-def check(pacman, dot, canvas, window):
-    if pacman.x - 30 <= dot.x <= pacman.x + 30\
-        and pacman.y - 30 <= dot.y <= pacman.y + 30:
-        canvas.delete(dot_queue[0]) # delete dot from the canvas
-        dot_queue.pop()
-        dot.changePos()
-        dot.draw(canvas)
-    window.after(100, check, pacman, dot, canvas, window) # use check() every 100 milliseconds
+def check(pacman, dot_object_q, canvas, window):
+    '''
+    for dot in dot_object_q:
+        if pacman.x - 30 <= dot.x <= pacman.x + 30\
+            and pacman.y - 30 <= dot.y <= pacman.y + 30:
+            position = dot_object_q.index(dot)
+            print(dot_queue[position])
+            canvas.delete(dot_queue[position]) # delete dot from the canvas
+            dot_queue.pop(position)
+            dot_object_q.pop(position)
+            #canvas.update()
+            #print(dot)
+            dot.changePos()
+            dot.draw(canvas)
+    '''
+    for dot in dot_object_q:
+        if pacman.x - 30 <= dot.x <= pacman.x + 30\
+            and pacman.y - 30 <= dot.y <= pacman.y + 30:
+            position = dot_object_q.index(dot)
+            canvas.delete(dot_queue[position])
+            dot_queue.pop()
+            dot.changePos()
+            dot.draw(canvas)
+            
+    window.after(100, check, pacman, dot_object_q, canvas, window) # use check() every 100 milliseconds
+
 
 
 def main():
@@ -100,9 +121,14 @@ def main():
     window.bind("<KeyPress-Up>", lambda event: pacman.moveUp(event, canvas))
     window.bind("<KeyPress-Down>", lambda event: pacman.moveDown(event, canvas))
     
-    dot = Dot(canvas)
-    
-    window.after(100, check, pacman, dot, canvas, window) # call check() to check dot&pacman after 100 milliseconds
+    #dot = Dot(canvas)
+
+    dot_object_q = []
+    for i in range(5):
+       dot = Dot(canvas)
+       dot_object_q.append(dot)
+
+    window.after(100, check, pacman, dot_object_q, canvas, window) # call check() to check dot&pacman after 100 milliseconds
     window.mainloop() # tk.mainloop() -> keep looping until there's an update
 
 main()
